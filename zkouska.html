@@ -1,0 +1,401 @@
+<section class="menu section bd-container" id="menu">
+  <h2 class="section-title">Menu týdne</h2>
+  <div class="dny" id="seznam-dnu"></div>
+
+  <div class="jidelnicek" id="obsah-jidelnicku">
+    <h2>Vyberte den</h2>
+    <p>Zde se zobrazí nabídka jídel.</p>
+  </div>
+
+  <!-- Popup Overlay -->
+  <div class="overlay" id="overlay">
+    <div class="popup">
+      <img id="popupImg" src="" alt="Jídlo">
+      <h2 id="popupTitle"></h2>
+      <button class="close-btn" id="closePopup">Zavřít</button>
+    </div>
+  </div>
+
+  <style>
+    .dny {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .den {
+      padding: 15px 22px;
+      border: 2px solid #444;
+      border-radius: 30px;
+      background: white;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+
+    .den:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .den.aktivni {
+      background: linear-gradient(135deg, #000, #444);
+      color: white;
+      font-weight: bold;
+      border-color: transparent;
+      transform: scale(1.05);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .stale-menu {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px 22px;
+      border: 2px solid #0077ff;
+      border-radius: 30px;
+      background: #e6f0ff;
+      color: #0056b3;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+      font-weight: bold;
+    }
+
+    .stale-menu:hover {
+      background: #cce0ff;
+      transform: translateY(-3px);
+    }
+
+    .stale-menu.aktivni {
+      background: #0077ff;
+      color: white;
+      border-color: transparent;
+      transform: scale(1.05);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .jidelnicek {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      max-width: 500px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s forwards;
+    }
+
+    .jidelnicek h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      color: #222;
+    }
+
+    .jidelnicek h3 {
+      font-size: 1.2rem;
+      margin: 15px 0 5px;
+      color: #0077ff;
+    }
+
+    .jidelnicek p {
+      font-size: 1rem;
+      margin: 0 0 10px;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1.4;
+    }
+
+    .jidelnicek p:hover {
+      color: #0077ff;
+      text-decoration: underline;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .popup img {
+      max-width: 100%;
+      max-height: 250px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .popup h2 {
+      margin-top: 0;
+    }
+
+    .close-btn {
+      margin-top: 15px;
+      padding: 8px 16px;
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      background: #cc0000;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+
+  <script>
+    const nazvyDnu = ["Pondělí","Úterý","Středa","Čtvrtek","Pátek","Sobota"];
+
+    const jidelnicekData = {
+      "2025-09-15": { // Pondělí
+        "Masové pokrmy": [
+          { text: "Kyjevská kotleta", img: "https://via.placeholder.com/300x200" },
+          { text: "Plněné kuřecí stehno", img: "https://via.placeholder.com/300x200" },
+          { text: "Kuřecí řízek", img: "https://via.placeholder.com/300x200" },
+          { text: "Vepřový řízek", img: "https://via.placeholder.com/300x200" },
+          { text: "Karbanátek s vepřovým masem", img: "https://via.placeholder.com/300x200" }
+          
+        ],
+        "Saláty": [
+          { text: "Caesar salát", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Polévky": [
+          { text: "Boršč", img: "https://via.placeholder.com/300x200" }
+        ]
+      },
+      "2025-09-16": { // Úterý
+        "Masové pokrmy": [
+          { text: "Vepřový karbanátek", img: "https://via.placeholder.com/300x200" },
+          { text: "Lasagne", img: "https://via.placeholder.com/300x200" },
+          { text: "Vepřové lodičky", img: "https://via.placeholder.com/300x200" },
+          { text: "Kuřecí hnízdo", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Přílohy": [
+          { text: "Pohanková kaše", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Polévky": [
+          { text: "Polévka s masovými kuličkami", img: "https://via.placeholder.com/300x200" }
+        ]
+      },
+      "2025-09-17": { // Středa
+        "Masové pokrmy": [
+          { text: "Smažená kuřecí kapsa", img: "https://via.placeholder.com/300x200" },
+          { text: "Palačinka s masem", img: "https://via.placeholder.com/300x200" },
+          { text: "Kuřecí grilované maso", img: "https://via.placeholder.com/300x200" },
+          { text: "Vepřový plátek s brambory a sýrem", img: "https://via.placeholder.com/300x200" },
+          { text: "Kuřecí plátek s ananasem", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Tradiční jídla": [
+          { text: "Moldavské sarmale", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Polévky": [
+          { text: "Hrachova polévka", img: "https://via.placeholder.com/300x200" }
+        ]
+      },
+      "2025-09-18": { // Čtvrtek
+        "Masové pokrmy": [
+          { text: "Vepřový karbanátek se sýrem", img: "https://via.placeholder.com/300x200" },
+          { text: "Hovězí kuličky s brambory", img: "https://via.placeholder.com/300x200" },
+          { text: "Smažená ryba", img: "https://via.placeholder.com/300x200" },
+          { text: "Kuřecí lasagne se špenátem", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Bezmasná jídla": [
+          { text: "Plněný lilek", img: "https://via.placeholder.com/300x200" },
+          { text: "Okurka v nálevu", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Polévky": [
+          { text: "Boršč", img: "https://via.placeholder.com/300x200" }
+        ]
+      },
+      "2025-09-19": { // Pátek
+        "Masové pokrmy": [
+          { text: "Makrela", img: "https://via.placeholder.com/300x200" },
+          { text: "Vepřové maso v rajčatovém protlaku", img: "https://via.placeholder.com/300x200" },
+          { text: "Plněná paprika", img: "https://via.placeholder.com/300x200" },
+          { text: "Kuřecí křídla s pečenými brambory", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Polévky": [
+          { text: "Polévka s masovými kuličkami", img: "https://via.placeholder.com/300x200" }
+        ]
+      },
+      "2025-09-20": { // Sobota
+        "Masové pokrmy": [
+          { text: "Guláš ze srnčího masa", img: "https://via.placeholder.com/300x200" },
+          { text: "Smažený kapr s česnekovou omáčkou", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Tradiční jídla": [
+          { text: "Moldavská mamaliga s balkánským sýrem", img: "https://via.placeholder.com/300x200" },
+          { text: "Moldavské sarmale", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Polévky": [
+          { text: "Fazolová polévka", img: "https://via.placeholder.com/300x200" }
+        ]
+      },
+      stale: {
+        "Slané pečivo": [
+          { text: "Pirožky s tvarohem", img: "https://via.placeholder.com/300x200" },
+          { text: "Pirožky s masem", img: "https://via.placeholder.com/300x200" },
+          { text: "Pirožky se zelím", img: "https://via.placeholder.com/300x200" },
+          { text: "Pirožky s povidlou", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Dezerty": [
+          { text: "Palačinky se sladkým tvarohem a rozinkami", img: "https://via.placeholder.com/300x200" },
+          { text: "Palačinky s višní a sladkou smetanou", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Tradiční jídla": [
+          { text: "Moldavská plačinta se zelím", img: "https://via.placeholder.com/300x200" },
+          { text: "Moldavská plačinta s bramborami", img: "https://via.placeholder.com/300x200" },
+          { text: "Moldavská plačinta s tvarohem", img: "https://via.placeholder.com/300x200" },
+          { text: "Moldavská plačinta s višněmi", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Saláty": [
+          { text: "Salát šuba", img: "https://via.placeholder.com/300x200" },
+          { text: "Salát olivier", img: "https://via.placeholder.com/300x200" },
+          { text: "Zeleninový salát", img: "https://via.placeholder.com/300x200" },
+          { text: "Vitamínový salát", img: "https://via.placeholder.com/300x200" },
+          { text: "Řecký salát", img: "https://via.placeholder.com/300x200" }
+        ],
+        "Přílohy": [
+          { text: "Bramborová kaše", img: "https://via.placeholder.com/300x200" },
+          { text: "Americké brambory", img: "https://via.placeholder.com/300x200" },
+          { text: "Rýže", img: "https://via.placeholder.com/300x200" },
+          { text: "Grilovaná zelenina", img: "https://via.placeholder.com/300x200" }
+        ]
+      }
+    };
+
+    function vytvorDny() {
+      const seznamDnu = document.getElementById("seznam-dnu");
+      const pocatecniDatum = new Date("2025-09-15");
+
+      for (let i = 0; i < nazvyDnu.length; i++) {
+        const datum = new Date(pocatecniDatum);
+        datum.setDate(pocatecniDatum.getDate() + i);
+
+        const prvekDne = document.createElement("div");
+        prvekDne.classList.add("den");
+        prvekDne.dataset.datum = datum.toISOString().split("T")[0];
+
+        prvekDne.innerHTML = `
+          <div><strong>${datum.getDate()}. ${datum.getMonth() + 1}.</strong></div>
+          <div>${nazvyDnu[i]}</div>
+        `;
+
+        prvekDne.addEventListener("click", () => vyberDen(prvekDne, datum));
+        seznamDnu.appendChild(prvekDne);
+
+        if (i === 0) {
+          prvekDne.classList.add("aktivni");
+          zobrazJidelnicek(datum);
+        }
+      }
+
+      const staleBtn = document.createElement("div");
+      staleBtn.classList.add("stale-menu");
+      staleBtn.textContent = "Stálé menu";
+      staleBtn.addEventListener("click", () => {
+        document.querySelectorAll(".den, .stale-menu").forEach(d => d.classList.remove("aktivni"));
+        staleBtn.classList.add("aktivni");
+        zobrazStaleMenu();
+      });
+      seznamDnu.appendChild(staleBtn);
+    }
+
+    function vyberDen(prvek, datum) {
+      document.querySelectorAll(".den, .stale-menu").forEach(d => d.classList.remove("aktivni"));
+      prvek.classList.add("aktivni");
+      zobrazJidelnicek(datum);
+    }
+
+    function zobrazJidelnicek(datum) {
+      const obsah = document.getElementById("obsah-jidelnicku");
+      const klicDatumu = datum.toISOString().split("T")[0];
+
+      if (jidelnicekData[klicDatumu]) {
+        const menu = jidelnicekData[klicDatumu];
+        let html = `<h2>Menu pro ${datum.getDate()}.${datum.getMonth() + 1}.${datum.getFullYear()}</h2>`;
+
+        Object.keys(menu).forEach(kategorie => {
+          html += `<h3>${kategorie}:</h3>`;
+          menu[kategorie].forEach(jidlo => {
+            html += `<p onclick="otevriPopup('${jidlo.text}', '${jidlo.img}')">${jidlo.text}</p>`;
+          });
+        });
+
+        obsah.innerHTML = html;
+      } else {
+        obsah.innerHTML = `<h2>Menu pro ${datum.getDate()}.${datum.getMonth() + 1}.${datum.getFullYear()}</h2><p>Menu zatím není k dispozici.</p>`;
+      }
+
+      obsah.style.animation = "none";
+      obsah.offsetHeight;
+      obsah.style.animation = "fadeIn 0.5s forwards";
+    }
+
+    function zobrazStaleMenu() {
+      const obsah = document.getElementById("obsah-jidelnicku");
+      const menu = jidelnicekData.stale;
+      let html = `<h2>Stálé menu</h2>`;
+
+      Object.keys(menu).forEach(kategorie => {
+        html += `<h3>${kategorie}:</h3>`;
+        menu[kategorie].forEach(jidlo => {
+          html += `<p onclick="otevriPopup('${jidlo.text}', '${jidlo.img}')">${jidlo.text}</p>`;
+        });
+      });
+
+      obsah.innerHTML = html;
+    }
+
+    function otevriPopup(title, img) {
+      document.getElementById("popupTitle").textContent = title;
+      document.getElementById("popupImg").src = img;
+      document.getElementById("overlay").style.display = "flex";
+    }
+
+    document.getElementById("closePopup").addEventListener("click", () => {
+      document.getElementById("overlay").style.display = "none";
+    });
+
+    document.getElementById("overlay").addEventListener("click", (e) => {
+      if (e.target === document.getElementById("overlay")) {
+        document.getElementById("overlay").style.display = "none";
+      }
+    });
+
+    vytvorDny();
+  </script>
+</section>
